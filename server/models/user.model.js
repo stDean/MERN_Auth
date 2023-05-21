@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const jwt = require('jsonwebtoken');
 
 const UserSchema = new mongoose.Schema({
   name: {
@@ -11,16 +12,12 @@ const UserSchema = new mongoose.Schema({
   email: {
     type: String,
     required: [true, 'Please provide you email.'],
-    match: [
-      /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
-    ],
     unique: true,
     trim: true
   },
   password: {
     type: String,
     required: [true, 'Please enter a secure password.'],
-    minLength: 6,
     trim: true
   },
   role: {
@@ -34,5 +31,21 @@ const UserSchema = new mongoose.Schema({
 },
   { timestamps: true }
 );
+
+UserSchema.methods.createAccessJWT = function () {
+  return jwt.sign(
+    { name: this.name, userId: this._id },
+    process.env.JWT_ACC_SECRET,
+    { expiresIn: "15m" }
+  );
+};
+
+UserSchema.methods.createRefreshJWT = function () {
+  return jwt.sign(
+    { name: this.name, userId: this._id },
+    process.env.JWT_REF_SECRET,
+    { expiresIn: "7d" }
+  );
+};
 
 module.exports = mongoose.model('User', UserSchema);
