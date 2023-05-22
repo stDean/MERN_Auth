@@ -109,7 +109,11 @@ const AuthController = {
       { new: true, runValidators: true }
     );
     res.status(StatusCodes.OK).json({ msg: "Password successfully changed!" })
-  }
+  },
+  logOut: async (req, res) => {
+    res.clearCookie('refreshToken', { path: '/api/v1/auth/refresh_token' });
+    return res.status(StatusCodes.OK).json({ msg: "Logged out." });
+  },
 }
 
 module.exports = AuthController;

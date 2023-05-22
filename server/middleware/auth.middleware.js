@@ -1,4 +1,5 @@
 const jwt = require('jsonwebtoken');
+
 const { UnauthenticatedError } = require('../errors');
 
 
@@ -12,8 +13,7 @@ const AuthMiddleware = async (req, res, next) => {
 
   try {
     const payload = jwt.verify(token, process.env.JWT_ACC_SECRET);
-    const { userId } = payload;
-    req.user = { userId };
+    req.user = payload;
     next();
   } catch (error) {
     throw new UnauthenticatedError('Invalid Authentication.');
