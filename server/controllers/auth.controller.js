@@ -18,7 +18,7 @@ const AuthController = {
       throw new BadRequestError("Please provide a proper email")
     }
 
-    const user = await User.find({ email });
+    const user = await User.findOne({ email });
     if (user) {
       throw new UnauthenticatedError('This Email address already exist.');
     }
@@ -56,7 +56,7 @@ const AuthController = {
 
     const user = await User.findOne({ email });
     if (!user) {
-      throw new UnauthenticatedError('No user with this email.');
+      throw new NotFoundError('No user with this email.');
     }
 
     const isCorrectPassword = await user.comparePassword(password);
@@ -82,6 +82,34 @@ const AuthController = {
     const access_token = createAccessJWT({ userID: user.userId });
     res.status(StatusCodes.OK).json({ access_token });
   },
+  forgetPassword: async (req, res) => {
+    const { email } = req.body;
+    const user = await User.findOne({ email });
+    if (!user) {
+      throw new NotFoundError('No user with this email.');
+    }
+
+    const access_token = createAccessJWT({ userId: user._id });
+    const url = `${CLIENT_URL}/user/reset/${access_token}`;
+    sendMail(email, url, "Reset your password");
+    res.status(StatusCodes.OK).json({ msg: "Check your email to reset password..", access_token })
+  },
+  resetPassword: async (req, res) => {
+    const { body: { password }, user: { userId } } = req;
+    if (password.length < 6) {
+      throw new BadRequestError("Provide a more secure password.")
+    }
+
+    const salt = await bcrypt.genSalt(10);
+    const hashPassword = await bcrypt.hash(password, salt);
+
+    await User.findOneAndUpdate(
+      { _id: userId },
+      { password: hashPassword },
+      { new: true, runValidators: true }
+    );
+    res.status(StatusCodes.OK).json({ msg: "Password successfully changed!" })
+  }
 }
 
 module.exports = AuthController;
