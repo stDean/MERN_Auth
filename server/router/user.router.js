@@ -10,7 +10,7 @@ const {
 router.route('/').get(AuthAdminMiddleware, getAllUser);
 router.route('/info').get(getUser)
 router.route('/update').patch(updateUser);
-router.route('/:id').patch(updateUserRole).delete(deleteUser);
+router.route('/:id').patch(AuthAdminMiddleware, updateUserRole).delete(AuthAdminMiddleware, deleteUser);
 
 
 module.exports = router;
