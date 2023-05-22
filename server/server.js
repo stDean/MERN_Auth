@@ -14,10 +14,12 @@ const connectDB = require('./connect/db');
 const RouteNotFound = require('./middleware/notFound.middleware');
 const ErrorHandling = require('./middleware/errorHandling.middleware');
 const AuthMiddleware = require('./middleware/auth.middleware');
+const UploadMiddleware = require('./middleware/upload.middleware');
 
 // routers
 const AuthRouter = require('./router/auth.router');
 const UserRouter = require('./router/user.router');
+const UploadRouter = require('./router/upload.router');
 
 app.use(express.json());
 app.use(cors());
@@ -29,6 +31,7 @@ app.use(fileUpload({
 // routes
 app.use('/api/v1/auth', AuthRouter);
 app.use('/api/v1/user', AuthMiddleware, UserRouter);
+app.use('/api/v1/user_avatar', UploadMiddleware, AuthMiddleware, UploadRouter);
 
 app.use(RouteNotFound);
 app.use(ErrorHandling);
