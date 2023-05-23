@@ -11,7 +11,7 @@ const AuthController = {
   register: async (req, res) => {
     const { name, email, password } = req.body;
     if (!name || !email || !password) {
-      throw new BadRequestError("All fields must be field");
+      throw new BadRequestError("All fields must be field")
     }
 
     if (!ValidateEmail(email)) {
