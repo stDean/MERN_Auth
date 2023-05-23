@@ -4,7 +4,7 @@ import axios from "axios";
 import { useDispatch } from "react-redux";
 
 import "./auth.styles.css";
-import { login } from "../../redux/slices/auth.slice";
+import { LOGIN } from "../../redux/slices/auth.slice";
 import { showSuccessMsg, showErrMsg } from "../notification/Notification.component";
 
 const initialState = {
@@ -33,7 +33,7 @@ const Login = () => {
       const res = await axios.post("/api/v1/auth/login", { email, password });
       setUser({ ...user, err: '', success: res.data.msg });
       localStorage.setItem('firstLogin', true);
-      dispatch(login());
+      dispatch(LOGIN());
 
       navigate('/');
     } catch (err) {

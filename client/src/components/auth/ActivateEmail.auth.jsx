@@ -16,8 +16,15 @@ const ActivateEmail = () => {
         try {
           const res = await axios.post('/api/v1/auth/activate', { actToken });
           setSuccess(res.data.msg);
+
+          setTimeout(() => {
+            setSuccess("");
+          }, 3000);
         } catch (err) {
           err.response.data.msg && setErr(err.response.data.msg);
+          setTimeout(() => {
+            setErr("");
+          }, 3000);
         }
       }
       return () => activationEmail();
