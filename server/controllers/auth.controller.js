@@ -84,6 +84,15 @@ const AuthController = {
   },
   forgetPassword: async (req, res) => {
     const { email } = req.body;
+
+    if (!email) {
+      throw new BadRequestError("Please provide your email")
+    }
+
+    if (!ValidateEmail(email)) {
+      throw new BadRequestError("Please provide a proper email")
+    }
+    
     const user = await User.findOne({ email });
     if (!user) {
       throw new NotFoundError('No user with this email.');

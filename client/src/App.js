@@ -11,7 +11,7 @@ import { fetchUser } from "./utils/fetchUser";
 function App() {
 
   const token = useSelector(({ token }) => token.token);
-  const { isLogged } = useSelector(({ auth }) => auth)
+  const { isLogged } = useSelector(({ auth }) => auth);
   const dispatch = useDispatch();
 
   useEffect(() => {
