@@ -12,7 +12,7 @@ const Header = () => {
     try {
       await axios.get('/api/v1/auth/logout');
       localStorage.removeItem('firstLogin');
-      window.location.href = "/login";
+      window.location.href = "/";
     } catch (err) {
       window.location.href = "/";
     }

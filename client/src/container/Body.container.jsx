@@ -1,7 +1,9 @@
 import { Routes, Route } from "react-router-dom";
 import { useSelector } from "react-redux";
 
-import { Login, Register, ActivateEmail, NotFound, ForgetPassword, ResetPassword } from "../components";
+import {
+  Login, Register, ActivateEmail, NotFound, ForgetPassword, ResetPassword, Home
+} from "../components";
 
 const Body = () => {
 
@@ -9,6 +11,7 @@ const Body = () => {
 
   return (
     <Routes>
+      <Route path="/" element={<Home />} />
       <Route path="/login" element={isLogged ? <NotFound /> : <Login />} />
       <Route path="/register" element={isLogged ? <NotFound /> : <Register />} />
       <Route path="/user/activate/:actToken" element={<ActivateEmail />} />

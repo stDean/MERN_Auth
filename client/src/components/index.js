@@ -5,3 +5,4 @@ export { default as ActivateEmail } from "./auth/ActivateEmail.auth";
 export { default as NotFound } from "./NotFound.component";
 export { default as ForgetPassword } from "./auth/ForgetPassword.auth";
 export { default as ResetPassword } from "./auth/ResetPassword.auth";
+export { default as Home } from "./home";
