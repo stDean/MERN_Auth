@@ -29,7 +29,7 @@ function App() {
     if (token) {
       const getUser = async () => {
         dispatch(LOGIN());
-        const { data } = await fetchUser(token);
+        const { data } = await fetchUser('/api/v1/user/info', token);
         dispatch(GET_USER({ user: data, isAdmin: data.role === 1 ? true : false }))
       }
       getUser()

@@ -26,7 +26,7 @@ const UserCtrl = {
       { new: true, runValidators: true }
     );
 
-    res.status(StatusCodes.OK).json({ msg: "Update Successfully!" });
+    res.status(StatusCodes.OK).json({ msg: "Update Successful!" });
   },
   updateUserRole: async (req, res) => {
     const { body: { role }, params: { id } } = req;
@@ -39,7 +39,7 @@ const UserCtrl = {
     if (!user) {
       throw new NotFoundError(`No user with id(${id}) found.`);
     }
-    res.status(StatusCodes.OK).json({ msg: "Update Successfully!" });
+    res.status(StatusCodes.OK).json({ msg: "Update Successful!" });
   },
   deleteUser: async (req, res) => {
     const { params: { id } } = req;
