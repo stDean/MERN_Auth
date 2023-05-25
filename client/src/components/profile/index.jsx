@@ -38,7 +38,7 @@ const Profile = () => {
       }
       getUsers()
     }
-  }, [token, callback, isAdmin, dispatch]);
+  }, [token, callback, isAdmin, dispatch])
 
   const handleChange = e => {
     const { name, value } = e.target
@@ -135,7 +135,7 @@ const Profile = () => {
       setData({ ...data, err: err.response.data.msg, success: '' })
     }
   }
-
+  
   return (
     <>
       <div>

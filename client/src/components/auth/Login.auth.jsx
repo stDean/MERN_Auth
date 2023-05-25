@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { useDispatch } from "react-redux";
+import { GoogleLogin } from "@react-oauth/google";
 
 import "./auth.styles.css";
 import { LOGIN } from "../../redux/slices/auth.slice";
@@ -40,6 +41,28 @@ const Login = () => {
       err.response.data.msg &&
         setUser({ ...user, err: err.response.data.msg, success: '' })
     }
+
+    setTimeout(() => {
+      setUser({ ...user, success: "", err: '' })
+    }, 3000)
+  }
+
+  const responseGoogle = async response => {
+    try {
+      const { data } = await axios.post('/api/v1/auth/google_login', { tokenId: response.credential });
+      setUser({ ...user, error: '', success: data.msg })
+      localStorage.setItem('firstLogin', true)
+
+      dispatch(LOGIN());
+      navigate('/');
+    } catch (err) {
+      err.response.data.msg &&
+        setUser({ ...user, err: err.response.data.msg, success: '' })
+    }
+
+    setTimeout(() => {
+      setUser({ ...user, success: "", err: '' })
+    }, 3000)
   }
 
   return (
@@ -79,6 +102,15 @@ const Login = () => {
           <Link to="/forget">Forgot your password?</Link>
         </div>
       </form>
+
+      <div className="socials">
+        <GoogleLogin
+          onSuccess={responseGoogle}
+          onError={() => {
+            console.log('Login Failed');
+          }}
+        />;
+      </div>
 
       <p>New Customer? <Link to="/register">Register</Link></p>
     </div>

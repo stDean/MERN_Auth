@@ -2,6 +2,10 @@ const { StatusCodes } = require("http-status-codes");
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
 
+const { google } = require('googleapis');
+const { OAuth2 } = google.auth;
+const client = new OAuth2(process.env.GOOGLE_CLIENT_ID)
+
 const User = require('../models/user.model');
 const { NotFoundError, BadRequestError, UnauthenticatedError } = require('../errors');
 const { JWT_ACT_SECRET, CLIENT_URL, JWT_REF_SECRET, JWT_ACC_SECRET } = process.env;
@@ -92,19 +96,19 @@ const AuthController = {
     if (!ValidateEmail(email)) {
       throw new BadRequestError("Please provide a proper email")
     }
-    
+
     const user = await User.findOne({ email });
     if (!user) {
       throw new NotFoundError('No user with this email.');
     }
 
-    const access_token = createAccessJWT({ userId: user._id });
+    const access_token = createAccessJWT({ userID: user._id });
     const url = `${CLIENT_URL}/user/reset/${access_token}`;
     sendMail(email, url, "Reset your password");
     res.status(StatusCodes.OK).json({ msg: "Check your email to reset password..", access_token })
   },
   resetPassword: async (req, res) => {
-    const { body: { password }, user: { userId } } = req;
+    const { body: { password }, user: { userID } } = req;
     if (password.length < 6) {
       throw new BadRequestError("Provide a more secure password.")
     }
@@ -113,7 +117,7 @@ const AuthController = {
     const hashPassword = await bcrypt.hash(password, salt);
 
     await User.findOneAndUpdate(
-      { _id: userId },
+      { _id: userID },
       { password: hashPassword },
       { new: true, runValidators: true }
     );
@@ -122,6 +126,48 @@ const AuthController = {
   logOut: async (req, res) => {
     res.clearCookie('refreshToken', { path: '/api/v1/auth/refresh_token' });
     return res.status(StatusCodes.OK).json({ msg: "Logged out." });
+  },
+  googleLogin: async (req, res) => {
+    const { tokenId } = req.body;
+
+    const verify = await client.verifyIdToken({ idToken: tokenId, audience: process.env.GOOGLE_CLIENT_ID });
+    const { email_verified, email, given_name, picture } = verify.payload;
+
+    const password = email + process.env.GOOGLE_SECRET;
+
+    const salt = await bcrypt.genSalt(10)
+    const passwordHash = await bcrypt.hash(password, salt);
+
+    if (!email_verified) throw new BadRequestError("Email verification failed.");
+
+    const user = await User.findOne({ email });
+
+    if (user) {
+      const isMatch = await user.comparePassword(password);
+      if (!isMatch) throw new BadRequestError("Password is incorrect.");
+
+      const refresh_token = user.createRefreshJWT()
+      res.cookie('refreshToken', refresh_token, {
+        httpOnly: true,
+        path: '/api/v1/auth/refresh_token',
+        maxAge: 7 * 24 * 60 * 60 * 1000 // 7 days
+      })
+
+      return res.status(StatusCodes.OK).json({ msg: "Login success!" });
+    } else {
+      const newUser = await User.create({
+        name: given_name, email, password: passwordHash, avatar: picture
+      })
+
+      const refresh_token = createRefreshToken({ id: newUser._id })
+      res.cookie('refreshToken', refresh_token, {
+        httpOnly: true,
+        path: '/api/v1/auth/refresh_token',
+        maxAge: 7 * 24 * 60 * 60 * 1000 // 7 days
+      })
+
+      return res.status(StatusCodes.OK).json({ msg: "Login success!" })
+    }
   },
 }
 
