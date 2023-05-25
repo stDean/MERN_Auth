@@ -103,13 +103,13 @@ const Login = () => {
         </div>
       </form>
 
-      <div className="socials">
+      <div className="social">
         <GoogleLogin
           onSuccess={responseGoogle}
           onError={() => {
             console.log('Login Failed');
           }}
-        />;
+        />
       </div>
 
       <p>New Customer? <Link to="/register">Register</Link></p>

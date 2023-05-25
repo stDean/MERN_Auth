@@ -159,7 +159,7 @@ const AuthController = {
         name: given_name, email, password: passwordHash, avatar: picture
       })
 
-      const refresh_token = createRefreshToken({ id: newUser._id })
+      const refresh_token = newUser.createRefreshJWT({ id: newUser._id })
       res.cookie('refreshToken', refresh_token, {
         httpOnly: true,
         path: '/api/v1/auth/refresh_token',
